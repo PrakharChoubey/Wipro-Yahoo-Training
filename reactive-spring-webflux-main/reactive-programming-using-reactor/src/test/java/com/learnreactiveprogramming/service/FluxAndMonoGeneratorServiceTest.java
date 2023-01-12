@@ -25,6 +25,42 @@ class FluxAndMonoGeneratorServiceTest {
     }
 
     @Test
+    void namesFlux_Immutability() {
+
+        //given
+
+        //when
+        var stringFlux = fluxAndMonoGeneratorService.namesFlux_immutablity()
+                .log();
+
+        //then
+        StepVerifier.create(stringFlux)
+                //.expectNext("ALEX", "BEN", "CHLOE")
+                .expectNextCount(3)
+                .verifyComplete();
+
+
+    }
+
+
+    @Test
+    void namesFlux_map() {
+
+        //given
+        int stringLength = 3;
+
+        //when
+        var namesFlux = fluxAndMonoGeneratorService.namesFlux_map(stringLength).log();
+
+        //then
+        StepVerifier.create(namesFlux)
+                //.expectNext("ALEX", "BEN", "CHLOE")
+                .expectNext("4-ALEX", "5-CHLOE")
+                .verifyComplete();
+
+    }
+
+    @Test
     void namesFlux_flatmap() {
         var nameFlx = fluxAndMonoGeneratorService.namesFlux_flatmap(3);
         StepVerifier.create(nameFlx)
@@ -55,6 +91,42 @@ class FluxAndMonoGeneratorServiceTest {
         StepVerifier.create(abcdefFlux)
                 .expectNext("A","B","C","D","E","F").verifyComplete();
     }
+
+    @Test
+    void namesFlux_flatmap_async() {
+
+        //given
+        int stringLength = 3;
+
+        //when
+        var namesFlux = fluxAndMonoGeneratorService.namesFlux_flatmap_async(stringLength).log();
+
+        //then
+        StepVerifier.create(namesFlux)
+                /*.expectNext("0-A", "1-L", "2-E", "3-X")
+                .expectNextCount(5)*/
+                .expectNextCount(9)
+                .verifyComplete();
+
+    }
+
+    @Test
+    void namesFlux_transform_switchIfEmpty() {
+
+        //given
+        int stringLength = 6;
+
+        //when
+        var namesFlux = fluxAndMonoGeneratorService.namesFlux_transform_switchIfEmpty(stringLength).log();
+
+        //then
+        StepVerifier.create(namesFlux)
+                .expectNext("D", "E", "F", "A", "U", "L", "T")
+                //.expectNextCount(5)
+                .verifyComplete();
+
+    }
+    
     @Test
     void explore_merge() {
         var abcdefFlux = fluxAndMonoGeneratorService.explore_merge();
