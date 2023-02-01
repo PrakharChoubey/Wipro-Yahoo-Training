@@ -50,7 +50,7 @@ public class MoviesInfoControllerUnitTest  {
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
     }
-
+    @Test
     void addMovieInfo(){
         var movieInfo = new MovieInfo(null, "BOOTMAN",
                 2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
@@ -101,6 +101,40 @@ public class MoviesInfoControllerUnitTest  {
                     assertNotNull(updatedMoiveInfo.getMovieInfoId());
                     assertEquals("BOOTMAN",updatedMoiveInfo.getName());
                 });
+    }
+
+    @Test
+    void addMovieInfo_validation(){
+        var movieInfo = new MovieInfo(null, "",
+                -2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+//        when(movieInfoServiceMock.addMovieInfo(isA(MovieInfo.class))).thenReturn(Mono.just(
+//                new MovieInfo("mockId", "BOOTMAN",
+//                        2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"))
+//        ));
+
+        webTestClient
+                .post()
+                .uri(MOVIE_INFO_URL)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .consumeWith(stringEntityExchangeResult -> {
+                    var responseBody =stringEntityExchangeResult.getResponseBody();
+                    System.out.println("responseBody = " + responseBody);
+                    var expectedMsg = "movieInfo.name must be present,movieInfo.year must be positive value";
+                    assertEquals(expectedMsg,responseBody);
+                    assert responseBody!=null;
+                })
+                /*.expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var savedMovie= movieInfoEntityExchangeResult.getResponseBody();
+                    assert savedMovie!=null;
+                    assert savedMovie.getMovieInfoId()!=null;
+                    assertEquals("mockId",savedMovie.getMovieInfoId());
+                })*/;
     }
 
 }

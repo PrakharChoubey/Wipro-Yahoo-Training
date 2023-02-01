@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
@@ -79,6 +80,22 @@ class MoviesInfoControllerIntgTest {
     }
 
     @Test
+    void getAllMovieInfoByYear(){
+        var uri = UriComponentsBuilder.fromUriString(MOVIE_INFO_URL)
+                .queryParam("year",2005)
+                .buildAndExpand()
+                .toUri();
+        webTestClient
+                .get()
+                .uri(uri)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(1);
+    }
+
+    @Test
     void getMovieInfoById(){
         var movieInfoId = "abc";
         webTestClient
@@ -119,6 +136,28 @@ class MoviesInfoControllerIntgTest {
     }
 
     @Test
+    void updateMovieInfo_notFound(){
+        var movieInfoId = "def";
+        var movieInfo = new MovieInfo(null, "BOOTMAN",
+                2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        webTestClient
+                .put()
+                .uri(MOVIE_INFO_URL+"/{id}",movieInfoId)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+        /*      .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var updatedMoiveInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assertNotNull(updatedMoiveInfo);
+                    assertNotNull(updatedMoiveInfo.getMovieInfoId());
+                    assertEquals("BOOTMAN",updatedMoiveInfo.getName());
+                });*/
+    }
+
+    @Test
     void deleteMovieInfo(){
         var movieInfoId = "abc";
         webTestClient
@@ -134,4 +173,6 @@ class MoviesInfoControllerIntgTest {
 //                   assertNotNull(deletedMovie);
 //                });
     }
+
+
 }

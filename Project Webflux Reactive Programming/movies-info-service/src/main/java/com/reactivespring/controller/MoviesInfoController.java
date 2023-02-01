@@ -3,6 +3,7 @@ package com.reactivespring.controller;
 import com.reactivespring.domain.MovieInfo;
 import com.reactivespring.repository.MovieInfoRepository;
 import com.reactivespring.service.MovieInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,28 +15,30 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/v1")
+@Slf4j
 public class MoviesInfoController {
 
-//    @Autowired
+    @Autowired
     private MovieInfoService movieInfoService;
 
-//    @Autowired
-    private MovieInfoRepository movieInfoRepository;
 
     //or use @Autowired
-    public MoviesInfoController(MovieInfoService movieInfoService,
-                                MovieInfoRepository movieInfoRepository) {
-        this.movieInfoService = movieInfoService;
-        this.movieInfoRepository = movieInfoRepository;
-    }
-
-    public MoviesInfoController(MovieInfoRepository movieInfoRepository) {
-        this.movieInfoRepository = movieInfoRepository;
-    }
-
-    public MoviesInfoController(MovieInfoService movieInfoService) {
-        this.movieInfoService = movieInfoService;
-    }
+//    public MoviesInfoController(MovieInfoService movieInfoService,
+//                                MovieInfoRepository movieInfoRepository) {
+//        this.movieInfoService = movieInfoService;
+//        this.movieInfoRepository = movieInfoRepository;
+//    }
+//
+//    public MoviesInfoController() {
+//    }
+//
+//    public MoviesInfoController(MovieInfoRepository movieInfoRepository) {
+//        this.movieInfoRepository = movieInfoRepository;
+//    }
+//
+//    public MoviesInfoController(MovieInfoService movieInfoService) {
+//        this.movieInfoService = movieInfoService;
+//    }
 
     @PostMapping("/movs")
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,7 +47,10 @@ public class MoviesInfoController {
     }
 
     @GetMapping("/movs")
-    public Flux<MovieInfo> getMoviesInfos(){
+    public Flux<MovieInfo> getMoviesInfos(@RequestParam(value = "year",required = false)Integer year){
+        log.info("Year is: {}",year);
+        if(year!=null)
+            return movieInfoService.getMovieInfoByYear(year);
         return movieInfoService.getAllMovieInfos().log();
     }
 
@@ -62,7 +68,7 @@ public class MoviesInfoController {
                 .log();
     }
 
-    @DeleteMapping("/mov/{id}")
+    @DeleteMapping("/movs/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteMovieInfo(@PathVariable String id){
         return movieInfoService.deleteMovieInfo(id);
