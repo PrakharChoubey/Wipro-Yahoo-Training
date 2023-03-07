@@ -13,6 +13,7 @@ public class App
         System.out.println( "Hello Wsd!" );
         System.out.println( "Hello World!" );
     }
+
     public static int add(int a, int b){
         return a+b;
     }
@@ -70,6 +71,8 @@ public class App
         }
         return result;
     }
+
+    //A FUNCTIOM
 
 
 }
